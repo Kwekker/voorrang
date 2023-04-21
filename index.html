@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        * {
+            color: white;
+        }
+
+        body {
+            background-color: black;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+  </head>
+  <body>
+
+    <div class="intersection">
+        <div class="corner topRight"></div>
+        <div class="corner topLeft"></div>
+        <div class="corner bottomLeft"></div>
+        <div class="corner bottomRight"></div>
+
+        <div class="midLineV"></div>
+        <div class="midLineH"></div>
+
+
+        <div id="vehicles">
+            <div class="car dir0 red"></div>
+            <div class="car dir1 green"></div>
+            <div class="car dir2 blue"></div>
+            <div class="car dir3 yellow"></div>
+        </div>
+
+        
+        
+        <img src="img/rarrow.png" class="arrow dir1">
+        <img src="img/larrow.png" class="arrow dir3">
+        <img src="img/sarrow.png" class="arrow dir3">
+
+    </div>
+      
+    
+    <!-- Your main.js file should go below this line -->
+    <script src="main.js"></script>
+  </body>
+</html>
