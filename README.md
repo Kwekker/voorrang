@@ -1,0 +1,1 @@
+This will be a tool to find out who has the right of way, on a European (specifically Dutch) intersection.
