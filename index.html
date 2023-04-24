@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>My Page</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="jquery.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 
     <style>
@@ -18,6 +18,16 @@
     </style>
   </head>
   <body>
+    
+    <div class="menu" id="menu">
+        <div>Car</div>
+        <div>Tram</div>
+        <div>
+            <img src="img/menuSharkteeth.png">
+            Shark Teeth
+        </div>
+    </div>
+      
 
     <div class="intersection">
         <div class="corner topRight"></div>
@@ -28,22 +38,22 @@
         <div class="midLineV"></div>
         <div class="midLineH"></div>
 
-
-        <div id="vehicles">
-            <div class="car dir0 red"></div>
-            <div class="car dir1 green"></div>
-            <div class="car dir2 blue"></div>
-            <div class="car dir3 yellow"></div>
+        <div class="dir0 dir" id="dir0">
+            <div class="car red"></div>
+            <div class="sharks"></div>
         </div>
-
-        
-        
-        <img src="img/rarrow.png" class="arrow dir1">
-        <img src="img/larrow.png" class="arrow dir3">
-        <img src="img/sarrow.png" class="arrow dir3">
-
+        <div class="dir1 dir" id="dir1">
+            <div class="car green"></div>
+            <img src="img/sarrow.png" class="arrow">
+        </div>
+        <div class="dir2 dir" id="dir2">
+            <div class="car blue"></div>
+        </div>
+        <div class="dir3 dir" id="dir3">
+            <div class="car yellow"></div> 
+        </div>
+    
     </div>
-      
     
     <!-- Your main.js file should go below this line -->
     <script src="main.js"></script>

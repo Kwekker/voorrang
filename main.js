@@ -1,48 +1,81 @@
-const vType = {
-    CAR: 0,
-    BIKE: 1,
-    TRAM: 2,
-    CONVOY: 3
+const VType = {
+    NONE: 0,
+    CAR: 1,
+    BIKE: 2,
+    TRAM: 3,
+    CONVOY: 4
 }
 
-const pedestrianType = {
+const PedestrianType = {
     NONE: 0,
     RIGHT: 1,
     LEFT: -1
 }
 
-let example = [
-    {   // Right road
-        vehicle: {
-            type: vType.CAR,
-            direction: 2
-            // Car coming from the right road, heading straight.
-        },
-        pedestrian: pedestrianType.RIGHT // Pedestrian coming from the right
+const classNames = ["", "car", "bike", "tram", "convoy"];
+const menuItems = $("#menu").children();
+for(let i = 0; i < menuItems.length; i++) {
+    menuItems[i].addEventListener("click", menuClick);
+}
+
+let current = [
+    {
+        vehicle: VType.CAR,
+        texture: "red",
+        dir: 1,
+        sharks: true
     },
     {
-        vehicle: {
-            type: vType.BIKE,
-            direction: 2
-        }
-        // No pedestrians
+        vehicle: VType.CAR,
+        texture: "blue",
+        dir: 0
     },
-    { 
-        vehicle: {
-            type: vType.CAR,
-            direction: 1
-        }
-    },
-    {}
+    {},
+    {
+        vehicle: VType.CAR,
+        texture: "green",
+        dir: 1
+    }
 ];
-// This should become:
 
-//       |     |
-//       | B   |
-//   --- + |   + ---
-//       <---^-- C1
-//    C2 ----|        
-//   --- +     + ---
-//       |     | 
-//       |     | 
-// Order is B, C1, C2 btw
+
+function render(setup) {
+    for(let i = 0; i < 4; i++) {
+        let dirEl = $("#dir" + i);
+        
+        $("#dir" + i).empty();
+        if(setup[i].vehicle != undefined) {
+            let el = $("<div>");
+
+            el.addClass(classNames[setup[i].vehicle]);
+            if(setup[i].vehicle == VType.CAR) el.addClass(setup[i].texture);
+
+            dirEl.append(el);
+        }
+
+        if(setup[i].dir != undefined) {
+            let el = $('<img>');
+
+            let dirLetter = ['', 'l', 's', 'r'][dirDif(i, setup[i].dir)];
+            el.attr("src", "img/" + dirLetter + "arrow.png");
+            dirEl.append(el);
+        }
+
+        if(setup[i].sharks) {
+            let el = $('<img>');
+            el.attr("src", "img/sharkteeth.png");
+            dirEl.append(el);
+        }
+    }
+}
+
+function dirDif(a, b) {
+    let dif = (a - b) % 4;
+    while(dif < 0) dif += 4;
+    return dif;
+}
+
+function menuClick(item) {
+    console.log("fuck you");
+    console.log(item);
+}

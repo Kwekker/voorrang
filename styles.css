@@ -1,5 +1,24 @@
 
 
+.menu {
+    background-color: darkgray;
+    border-left: white 1px solid;
+    float: right;
+    width: 400px;
+    font-size: 60px;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    padding: 0 10px;
+}
+.menu div {
+    border: black 2px;
+    border-style: solid none;
+    padding: 8px 4px;
+}
+.menu img {
+    width: 100%;
+}
+
 .intersection {
     border-right: gainsboro solid 2px;
     height: 100vh;
@@ -73,41 +92,42 @@
     background-color: yellow;
 }
 
-.car {
-    border: 3px solid darkgray;
+.dir * {
     position: absolute;
 }
 
-.car.dir0 {
-    height: 10%;
+.car {
+    border: 3px solid darkgray;
+}
+.dir0 .car {
+    height: 8%;
     aspect-ratio: 2;
-    right: 5%;
+    right: 1%;
     top: 34.5%;
 }
-.car.dir1 {
-    width: 10%;
+.dir1 .car {
+    width: 8%;
     aspect-ratio: .5;
-    top: 5%;
+    top: 1%;
     left: 34.5%;
 }
-.car.dir2 {
-    height: 10%;
+.dir2 .car {
+    height: 8%;
     aspect-ratio: 2;
-    left: 5%;
+    left: 1%;
     bottom: 34.5%;
 }
-.car.dir3 {
-    width: 10%;
+.dir3 .car {
+    width: 8%;
     aspect-ratio: .5;
-    bottom: 5%;
+    bottom: 1%;
     right: 34.5%;
 }
 
-.arrow {
-    position:absolute;
+.intersection img {
     width: 100%;
 }
-.arrow.dir0 { rotate: 0deg;}
-.arrow.dir1 { rotate: -90deg;}
-.arrow.dir2 { rotate: 180deg;}
-.arrow.dir3 { rotate: 90deg;}
+.dir0 img { rotate: 0deg;}
+.dir1 img { rotate: -90deg;}
+.dir2 img { rotate: 180deg;}
+.dir3 img { rotate: 90deg;}
