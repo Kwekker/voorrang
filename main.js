@@ -22,11 +22,12 @@ for(let i = 0; i < 4; i++) {
     hitboxes[i] = $("#hitbox" + i);
     hitboxes[i].hover(function() {hitboxHover(i, true)}, function() {hitboxHover(i, false)});
 }
+let currentHover = undefined;
 
-let movingType = 0;
-let movingItem = undefined;
+// moving is an object with a key/value pair. For example: {vehicle: VType.car}
+let moving = undefined;
 
-let current = [
+let currentSetup = [
     {
         vehicle: VType.CAR,
         texture: "red car",
@@ -49,28 +50,32 @@ let current = [
 
 function render(setup) {
     for(let i = 0; i < 4; i++) {        
-        if(setup[i].vehicle != undefined) {
-            let el = $("#vehicle" + i);
-            el.removeClass();
-            el.addClass(setup[i].texture);
-        }
-        else $("#vehicle" + i).addClass("hide");
-
-        if(setup[i].dir != undefined) {
-            let dirLetter = ['', 'l', 's', 'r'][dirDif(i, setup[i].dir)];
-            let el = $('#arrow' + i);
-            el.removeClass();
-            el.attr("src", "img/" + dirLetter + "arrow.png");
-        }
-        else $("#arrow" + i).addClass("hide");
-
-        if(setup[i].sharks) {
-            let el = $('#sharks' + i);
-            el.removeClass("hide");
-            el.attr("src", "img/sharkteeth.png");
-        }
-        else $("#sharks" + i).addClass("hide");
+        renderDir(setup[i], i);
     }
+}
+
+function renderDir(direction, index) {
+    if(direction.vehicle != undefined) {
+        let el = $("#vehicle" + index);
+        el.removeClass();
+        el.addClass(direction.texture);
+    }
+    else $("#vehicle" + index).addClass("hide");
+
+    if(direction.dir != undefined) {
+        let dirLetter = ['', 'l', 's', 'r'][dirDif(index, direction.dir)];
+        let el = $('#arrow' + index);
+        el.removeClass();
+        el.attr("src", "img/" + dirLetter + "arrow.png");
+    }
+    else $("#arrow" + index).addClass("hide");
+
+    if(direction.sharks) {
+        let el = $('#sharks' + index);
+        el.removeClass("hide");
+        el.attr("src", "img/sharkteeth.png");
+    }
+    else $("#sharks" + index).addClass("hide");
 }
 
 function dirDif(a, b) {
@@ -79,10 +84,37 @@ function dirDif(a, b) {
     return dif;
 }
 
+const menuToKeyValuePair = {
+    car: {vehicle: VType.CAR, texture: "red car"},
+    bike: {vehicle: VType.CAR, texture: "blue car"},
+    sharks: {sharks: true}
+};
 function menuClick(item) {
-    console.log(item.target.innerText);
+    let itemId = item.target.id.substr(4);
+    if(itemId == "") itemId = item.target.parentElement.id.substr(4);
+    console.log(itemId);
+    moving = menuToKeyValuePair[itemId];
 }
 
+
+let oldDirection = [];
 function hitboxHover(index, direction) {
-    console.log(index, direction);
+    // Set the currentHover variable
+    if(direction) currentHover = index;
+    else if(currentHover == index) currentHover = undefined;
+
+    // Handle placement
+    if(moving != undefined) {
+        if(direction) {
+            oldDirection[index] = $.extend(true,{},currentSetup[index]);
+            for(let obj of Object.entries(moving)) {
+                currentSetup[index][obj[0]] = obj[1];
+            }
+            renderDir(currentSetup[index], index);
+        }
+        else {
+            currentSetup[index] = $.extend(true,{},oldDirection[index]);
+            renderDir(currentSetup[index], index);
+        }
+    }
 }
