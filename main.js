@@ -1,9 +1,8 @@
 const VType = {
     NONE: 0,
     CAR: 1,
-    BIKE: 2,
-    TRAM: 3,
-    CONVOY: 4
+    TRAM: 2,
+    CONVOY: 3
 }
 
 const PedestrianType = {
@@ -24,54 +23,53 @@ for(let i = 0; i < 4; i++) {
     hitboxes[i].hover(function() {hitboxHover(i, true)}, function() {hitboxHover(i, false)});
 }
 
+let movingType = 0;
+let movingItem = undefined;
+
 let current = [
     {
         vehicle: VType.CAR,
-        texture: "red",
+        texture: "red car",
         dir: 1,
         sharks: true
     },
     {
         vehicle: VType.CAR,
-        texture: "blue",
+        texture: "blue car",
         dir: 0
     },
     {},
     {
         vehicle: VType.CAR,
-        texture: "green",
+        texture: "green car",
         dir: 1
     }
 ];
 
 
 function render(setup) {
-    for(let i = 0; i < 4; i++) {
-        let dirEl = $("#dir" + i);
-        
-        $("#dir" + i).empty();
+    for(let i = 0; i < 4; i++) {        
         if(setup[i].vehicle != undefined) {
-            let el = $("<div>");
-
-            el.addClass(classNames[setup[i].vehicle]);
-            if(setup[i].vehicle == VType.CAR) el.addClass(setup[i].texture);
-
-            dirEl.append(el);
+            let el = $("#vehicle" + i);
+            el.removeClass();
+            el.addClass(setup[i].texture);
         }
+        else $("#vehicle" + i).addClass("hide");
 
         if(setup[i].dir != undefined) {
-            let el = $('<img>');
-
             let dirLetter = ['', 'l', 's', 'r'][dirDif(i, setup[i].dir)];
+            let el = $('#arrow' + i);
+            el.removeClass();
             el.attr("src", "img/" + dirLetter + "arrow.png");
-            dirEl.append(el);
         }
+        else $("#arrow" + i).addClass("hide");
 
         if(setup[i].sharks) {
-            let el = $('<img>');
+            let el = $('#sharks' + i);
+            el.removeClass("hide");
             el.attr("src", "img/sharkteeth.png");
-            dirEl.append(el);
         }
+        else $("#sharks" + i).addClass("hide");
     }
 }
 

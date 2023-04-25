@@ -1,19 +1,21 @@
 
 
 .menu {
-    background-color: darkgray;
+    background-color: #222;
     border-left: white 1px solid;
     float: right;
-    width: 400px;
-    font-size: 60px;
+    width: 200px;
+    font-size: 16px;
     font-family: Arial, Helvetica, sans-serif;
     text-align: center;
     padding: 0 10px;
 }
 .menu div {
-    border: black 2px;
-    border-style: solid none;
+    border-bottom: solid black 2px;
     padding: 8px 4px;
+}
+.menu div:last-child {
+    border-bottom: none;
 }
 .menu img {
     width: 100%;
@@ -156,3 +158,8 @@
 .dir1 img { rotate: -90deg;}
 .dir2 img { rotate: 180deg;}
 .dir3 img { rotate: 90deg;}
+
+
+.hide {
+    display: none;
+}
