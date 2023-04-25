@@ -45,38 +45,63 @@
     background-color: darkgray;
     display: inline-block;
     position: absolute;
-
+    border: dimgray 10px solid;
     width: 30%;
     height: 30%;
 }
 
 .corner.topRight {
-    border: dimgray 10px solid;
     border-top: none;
     border-right: none;
     top: 0px;
     right: 0px;
 }
 .corner.topLeft {
-    border: dimgray 10px solid;
     border-top: none;
     border-left: none;
     top: 0px;
     left: 0px;
 }
 .corner.bottomLeft {
-    border: dimgray 10px solid;
     border-left: none;
     border-bottom: none;
     bottom: 0px;
     left: 0px;
 }
 .corner.bottomRight {
-    border: dimgray 10px solid;
     border-right: none;
     border-bottom: none;
     bottom: 0px;
     right: 0px;
+}
+
+.hitbox {
+    position: absolute;
+}
+
+.hitbox.hit0 {
+    height: 20%;
+    width: 50%;
+    right: 0;
+    top: 30%;
+}
+.hitbox.hit1 {
+    height: 50%;
+    width: 20%;
+    top: 0;
+    left: 30%;
+}
+.hitbox.hit2 {
+    height: 20%;
+    width: 50%;
+    left: 0;
+    bottom: 30%;
+}
+.hitbox.hit3 {
+    height: 50%;
+    width: 20%;
+    bottom: 0;
+    right: 30%;
 }
 
 .red {

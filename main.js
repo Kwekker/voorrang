@@ -18,6 +18,12 @@ for(let i = 0; i < menuItems.length; i++) {
     menuItems[i].addEventListener("click", menuClick);
 }
 
+let hitboxes = [];
+for(let i = 0; i < 4; i++) {
+    hitboxes[i] = $("#hitbox" + i);
+    hitboxes[i].hover(function() {hitboxHover(i, true)}, function() {hitboxHover(i, false)});
+}
+
 let current = [
     {
         vehicle: VType.CAR,
@@ -76,6 +82,9 @@ function dirDif(a, b) {
 }
 
 function menuClick(item) {
-    console.log("fuck you");
-    console.log(item);
+    console.log(item.target.innerText);
+}
+
+function hitboxHover(index, direction) {
+    console.log(index, direction);
 }
