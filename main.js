@@ -11,6 +11,11 @@ const PedestrianType = {
     LEFT: -1
 }
 
+$("#intersection").on("contextmenu", function(e) {
+    e.preventDefault(); // This will prevent the default right-click context menu from appearing
+    hitboxClick(e);
+});
+
 const classNames = ["", "car", "bike", "tram", "convoy"];
 const menuItems = $("#menu").children();
 for(let i = 0; i < menuItems.length; i++) {
@@ -21,6 +26,7 @@ let hitboxes = [];
 for(let i = 0; i < 4; i++) {
     hitboxes[i] = $("#hitbox" + i);
     hitboxes[i].hover(function() {hitboxHover(i, true)}, function() {hitboxHover(i, false)});
+    hitboxes[i].click(hitboxClick);
 }
 let currentHover = undefined;
 
@@ -46,6 +52,8 @@ let currentSetup = [
         dir: 1
     }
 ];
+
+render(currentSetup);
 
 
 function render(setup) {
@@ -96,25 +104,60 @@ function menuClick(item) {
     moving = menuToKeyValuePair[itemId];
 }
 
+$(document).keyup(function(e) {
+    if (e.key === "Escape") {
+        moving = undefined;
+        restoreOldSetup(currentHover);
+   }
+});
 
-let oldDirection = [];
+
 function hitboxHover(index, direction) {
     // Set the currentHover variable
     if(direction) currentHover = index;
     else if(currentHover == index) currentHover = undefined;
-
+    
     // Handle placement
     if(moving != undefined) {
         if(direction) {
-            oldDirection[index] = $.extend(true,{},currentSetup[index]);
+            backupSetup(index);
             for(let obj of Object.entries(moving)) {
                 currentSetup[index][obj[0]] = obj[1];
             }
             renderDir(currentSetup[index], index);
         }
         else {
-            currentSetup[index] = $.extend(true,{},oldDirection[index]);
+            restoreOldSetup(index);
+        }
+    }
+}
+
+let oldSetup = [];
+function backupSetup(index) {
+    oldSetup[index] = $.extend(true,{},currentSetup[index]);
+}
+
+function restoreOldSetup(index) {
+    currentSetup[index] = $.extend(true,{},oldSetup[index]);
+    renderDir(currentSetup[index], index);
+}
+
+function hitboxClick(event) {
+    if(moving != undefined) {
+        let index = event.target.id.substr(6);
+
+        if(event.type == "contextmenu") {
+            for(let obj of Object.entries(moving)) {
+                currentSetup[index][obj[0]] = undefined;
+                oldSetup[index][obj[0]] = undefined;
+                // Remove arrow if it's a vehicle
+                if(obj[0] == "vehicle") {
+                    currentSetup[index].dir = undefined;
+                    oldSetup[index].dir = undefined;
+                }
+            }
             renderDir(currentSetup[index], index);
         }
+        else backupSetup(index);
     }
 }
