@@ -30,8 +30,9 @@ for(let i = 0; i < 4; i++) {
 }
 let currentHover = undefined;
 
-// moving is an object with a key/value pair. For example: {vehicle: VType.car}
-let moving = undefined;
+// placing is an object with a key/value pair. For example: {vehicle: VType.car}
+let placing = undefined;
+let placingDir = undefined;
 
 let currentSetup = [
     {
@@ -89,6 +90,7 @@ function renderDir(direction, index) {
 function dirDif(a, b) {
     let dif = (a - b) % 4;
     while(dif < 0) dif += 4;
+    console.log("Dirdif between ", a, b, "is ", dif);
     return dif;
 }
 
@@ -101,12 +103,12 @@ function menuClick(item) {
     let itemId = item.target.id.substr(4);
     if(itemId == "") itemId = item.target.parentElement.id.substr(4);
     console.log(itemId);
-    moving = menuToKeyValuePair[itemId];
+    placing = menuToKeyValuePair[itemId];
 }
 
 $(document).keyup(function(e) {
     if (e.key === "Escape") {
-        moving = undefined;
+        placing = undefined;
         restoreOldSetup(currentHover);
    }
 });
@@ -118,10 +120,16 @@ function hitboxHover(index, direction) {
     else if(currentHover == index) currentHover = undefined;
     
     // Handle placement
-    if(moving != undefined) {
+    if(placingDir) { // Check if we're placing a direction arrow
+        if(!direction || placingDir == index) return;
+        console.log("kleine katten hjihi");
+        currentSetup[placingDir].dir = index;
+        renderDir(currentSetup[placingDir], placingDir);
+    }
+    else if(placing != undefined && placingDir == undefined) {
         if(direction) {
             backupSetup(index);
-            for(let obj of Object.entries(moving)) {
+            for(let obj of Object.entries(placing)) {
                 currentSetup[index][obj[0]] = obj[1];
             }
             renderDir(currentSetup[index], index);
@@ -143,11 +151,14 @@ function restoreOldSetup(index) {
 }
 
 function hitboxClick(event) {
-    if(moving != undefined) {
+    if(placing != undefined) {
         let index = event.target.id.substr(6);
 
-        if(event.type == "contextmenu") {
-            for(let obj of Object.entries(moving)) {
+        if(placingDir != undefined) {
+            placingDir = undefined;
+        }
+        else if(event.type == "contextmenu") {
+            for(let obj of Object.entries(placing)) {
                 currentSetup[index][obj[0]] = undefined;
                 oldSetup[index][obj[0]] = undefined;
                 // Remove arrow if it's a vehicle
@@ -157,6 +168,11 @@ function hitboxClick(event) {
                 }
             }
             renderDir(currentSetup[index], index);
+        }
+        else if(placing.vehicle != undefined) {
+            backupSetup(index);
+            placingDir = index;
+            console.log("poez", placingDir);
         }
         else backupSetup(index);
     }
