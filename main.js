@@ -16,13 +16,14 @@ const ExtraType = {
     SHARKS: 1,
     STOP: 2,
     UNHARDENED: 3,
+    // ExtraType.EXIT is an "uitrit", which means you have to let EVERYONE go first.
+    // It overrules all the other 'extra' types, so I'm adding it to this category,
+    // because you'll never see any of these ones at the same time.
+    // (Ok you might see an unhardened road with a stop sign but that doesn't do anything to the rules.)
+    EXIT: 4
 }
 const extraFileName = ["", "sharks.svg", "stop.svg", "unhardened.svg"];
 
-$("#intersection").on("contextmenu", function(e) {
-    e.preventDefault(); // This will prevent the default right-click context menu from appearing
-    hitboxClick(e);
-});
 
 const classNames = ["", "car", "bike", "tram", "convoy"];
 const menuItems = $("#menu").children();
@@ -33,6 +34,11 @@ for(let i = 0; i < menuItems.length; i++) {
 let hitboxes = [];
 for(let i = 0; i < 4; i++) {
     hitboxes[i] = $("#hitbox" + i);
+    console.log(hitboxes[i]);
+    hitboxes[i].contextmenu(function(e) {
+        e.preventDefault();
+        hitboxClick(e);
+    });
     hitboxes[i].hover(function() {hitboxHover(i, true)}, function() {hitboxHover(i, false)});
     hitboxes[i].click(hitboxClick);
 }
@@ -42,32 +48,20 @@ let currentHover = undefined;
 let placing = undefined;
 let placingDir = undefined;
 
-let currentSetup = [
-    {
-        vehicle: VType.CAR,
-        texture: "red car",
-        dir: 1,
-        extra: ExtraType.SHARKS,
-        passage: true
-    },
-    {
-        vehicle: VType.CAR,
-        texture: "blue car",
-        dir: 0
-    },
-    {
-        passage: true
-    },
-    {
-        vehicle: VType.CAR,
-        texture: "green car",
-        dir: 1
-    }
-];
+$(document).keyup(function(e) {
+    if (e.key === "Escape") {
+        placing = undefined;
+        placingDir = undefined;
+        menuTarget.classList.remove("selected");
+        render(currentSetup);
+        $("#messageLeft").addClass("hide");
+        $("#messageRight").addClass("hide");
+   }
+});
+
+let currentSetup = [{}, {}, {}, {}];
 
 render(currentSetup);
-
-
 function render(setup) {
     for(let i = 0; i < 4; i++) {        
         renderDir(setup[i], i);
@@ -110,33 +104,62 @@ function dirDif(a, b) {
     return dif;
 }
 
+
+const menuItemType = {
+    car: "vehicle",
+    bike: "vehicle",
+    tram: "vehicle",
+    convoy: "vehicle",
+    pedestrian: "pedestrian",
+    passage: "passageway",
+    sharks: "addition",
+}
+const menuItemIsPlural = {
+    sharks: true
+};
 const menuToKeyValuePair = {
     car: {vehicle: VType.CAR, texture: "red car"},
     bike: {vehicle: VType.CAR, texture: "blue car"},
     tram: {vehicle: VType.TRAM, texture: "green car"},
-    sharks: {extra: ExtraType.SHARKS}
+    sharks: {extra: ExtraType.SHARKS},
+    passage: {passage: true},
 };
 let menuTarget = undefined;
 function menuClick(item) {
+    // Make sure only one menu item is highlighted
     if(menuTarget != undefined) menuTarget.classList.remove("selected");
 
     menuTarget = item.target;
     if(menuTarget.tagName == "IMG") menuTarget = menuTarget.parentElement;
     let itemId = menuTarget.id.substr(4);
 
+    // Highlight the menu item
     menuTarget.classList.add("selected");
-
     placing = menuToKeyValuePair[itemId];
+
+    // Show placing messages
+    console.log(menuTarget);
+    if(menuItemIsPlural[itemId]) 
+        $("#messageLeft").removeClass("hide").text("Placing " + menuTarget.innerText);
+    else 
+        $("#messageLeft").removeClass("hide").text("Placing a " + menuTarget.innerText);
+    $("#messageRight").removeClass("hide").html(
+        "Press escape to stop<br>"
+        + "Right click to remove a"
+        // Gotta have that correct English
+        + ("aeoui".includes(menuItemType[itemId].charAt(0)) ? "n " : " ")
+        + menuItemType[itemId]
+    );
 }
 
-$(document).keyup(function(e) {
-    if (e.key === "Escape") {
-        placing = undefined;
-        menuTarget.classList.remove("selected");
-        restoreOldSetup(currentHover);
-   }
-});
-
+let newSetup = [];
+function implementNewSetup(index) {
+    currentSetup[index] = $.extend(true,{},newSetup[index]);
+    renderDir(currentSetup[index], index);
+}
+function currentToNewSetup(index) {
+    newSetup[index] = $.extend(true,{},currentSetup[index]);
+}
 
 function hitboxHover(index, direction) {
     // Set the currentHover variable
@@ -144,58 +167,51 @@ function hitboxHover(index, direction) {
     else if(currentHover == index) currentHover = undefined;
     
     // Handle placement
-    if(placingDir) { // Check if we're placing a direction arrow
-        if(!direction || placingDir == index) return;
-        currentSetup[placingDir].dir = index;
-        renderDir(currentSetup[placingDir], placingDir);
+    if(placingDir != undefined && placingDir != index && direction) { // Check if we're placing a direction arrow
+        newSetup[placingDir].dir = index;
+        renderDir(newSetup[placingDir], placingDir);
     }
     else if(placing != undefined && placingDir == undefined) {
         if(direction) {
-            backupSetup(index);
+            currentToNewSetup(index);
             for(let obj of Object.entries(placing)) {
-                currentSetup[index][obj[0]] = obj[1];
+                newSetup[index][obj[0]] = obj[1];
             }
-            renderDir(currentSetup[index], index);
+            renderDir(newSetup[index], index);
         }
         else {
-            restoreOldSetup(index);
+            renderDir(currentSetup[index], index);
         }
     }
-}
-
-let oldSetup = [];
-function backupSetup(index) {
-    oldSetup[index] = $.extend(true,{},currentSetup[index]);
-}
-
-function restoreOldSetup(index) {
-    currentSetup[index] = $.extend(true,{},oldSetup[index]);
-    renderDir(currentSetup[index], index);
 }
 
 function hitboxClick(event) {
     if(placing != undefined) {
+        // Get the clicked index
         let index = event.target.id.substr(6);
 
         if(placingDir != undefined) {
+            // The clicked index is not necessarily the index the arrow is currently pointing at.
+            implementNewSetup(placingDir);            
             placingDir = undefined;
         }
         else if(event.type == "contextmenu") {
             for(let obj of Object.entries(placing)) {
                 currentSetup[index][obj[0]] = undefined;
-                oldSetup[index][obj[0]] = undefined;
+                newSetup[index][obj[0]] = undefined;
                 // Remove arrow if it's a vehicle
                 if(obj[0] == "vehicle") {
                     currentSetup[index].dir = undefined;
-                    oldSetup[index].dir = undefined;
+                    newSetup[index].dir = undefined;
                 }
             }
             renderDir(currentSetup[index], index);
         }
         else if(placing.vehicle != undefined) {
-            backupSetup(index);
             placingDir = index;
         }
-        else backupSetup(index);
+        else {
+            implementNewSetup(index);
+        }
     }
 }
