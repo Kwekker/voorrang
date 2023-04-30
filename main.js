@@ -183,11 +183,17 @@ function hitboxHover(index, direction) {
         renderDir(newSetup[placingSpecial.dir], placingSpecial.dir);
     }
     else if(placingSpecial.type == "pedestrian") {
-        const clickedDir = +(placingSpecial.dir);
-        const nextDir = (clickedDir + 1) % 4;
-        const dif = dirDif(index, clickedDir);
+        const clickedIndex = +(placingSpecial.dir);
+        const dif = dirDif(index, clickedIndex);
 
-        console.log(clickedDir, nextDir, dif);
+        if(direction) {
+            if(dif == 0) newSetup[clickedIndex].pedestrian = PedestrianType.RIGHT;
+            else if (dif == 3) newSetup[clickedIndex].pedestrian = PedestrianType.LEFT;
+        }
+        else {
+            newSetup[clickedIndex].pedestrian = PedestrianType.HOVER;
+        }
+        renderDir(newSetup[clickedIndex], clickedIndex);
 
     }
     else if(placing != undefined && placingSpecial.type == undefined) {
@@ -216,10 +222,10 @@ function hitboxClick(event) {
                 placing = undefined;
                 return;
             }
+            if(placingSpecial.type == "pedestrian" && dirDif(placingSpecial.dir, index) > 1) return;
             // The clicked index is not necessarily the index the arrow is currently pointing at.
             implementNewSetup(placingSpecial.dir);            
             placingSpecial.type = undefined;
-            placingPedestrian = undefined;
         }
         else if(event.type == "contextmenu") {
             for(let obj of Object.entries(placing)) {
@@ -234,6 +240,8 @@ function hitboxClick(event) {
             renderDir(currentSetup[index], index);
         }
         else if(placing.pedestrian != undefined) {
+            newSetup[index].pedestrian = PedestrianType.RIGHT;
+            renderDir(newSetup[index], index);
             placingSpecial.type = "pedestrian";
             placingSpecial.dir = index;
         }
