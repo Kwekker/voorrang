@@ -7,8 +7,10 @@ const VType = {
 
 const PedestrianType = {
     NONE: 0,
-    RIGHT: 1,
-    LEFT: -1
+    LEFT: 1,
+    RIGHT: 2,
+    HOVER: 3, // For the preview while placing a pedestrian
+    letter: ['', 'l', 'r', 'h']
 }
 
 const ExtraType = {
@@ -24,34 +26,45 @@ const ExtraType = {
 }
 const extraFileName = ["", "sharks.svg", "stop.svg", "unhardened.svg"];
 
+// placing is an object with the elements that have to be added to the setup direction object.
+// For example: {vehicle: VType.car}
+let placing = undefined;
+let placingSpecial = {type: undefined, dir: 0};
+
+
+class MenuItem {
+    constructor(placeObject, type, plural) {
+        this.placeObject = placeObject;
+        this.type = type;
+        this.plural = (plural == undefined ? false : plural);
+    }
+}
 
 const classNames = ["", "car", "bike", "tram", "convoy"];
-const menuItems = $("#menu").children();
-for(let i = 0; i < menuItems.length; i++) {
-    menuItems[i].addEventListener("click", menuClick);
+const menuItemElements = $("#menu").children();
+for(let i = 0; i < menuItemElements.length; i++) {
+    menuItemElements[i].addEventListener("click", menuClick);
 }
 
 let hitboxes = [];
+let corners = [];
 for(let i = 0; i < 4; i++) {
     hitboxes[i] = $("#hitbox" + i);
-    console.log(hitboxes[i]);
+
     hitboxes[i].contextmenu(function(e) {
         e.preventDefault();
         hitboxClick(e);
     });
+
     hitboxes[i].hover(function() {hitboxHover(i, true)}, function() {hitboxHover(i, false)});
     hitboxes[i].click(hitboxClick);
 }
 let currentHover = undefined;
 
-// placing is an object with a key/value pair. For example: {vehicle: VType.car}
-let placing = undefined;
-let placingDir = undefined;
-
 $(document).keyup(function(e) {
     if (e.key === "Escape") {
         placing = undefined;
-        placingDir = undefined;
+        placingSpecial.type = undefined;
         menuTarget.classList.remove("selected");
         render(currentSetup);
         $("#messageLeft").addClass("hide");
@@ -59,7 +72,8 @@ $(document).keyup(function(e) {
    }
 });
 
-let currentSetup = [{}, {}, {}, {}];
+let currentSetup = [{pedestrian: PedestrianType.RIGHT}, {pedestrian: PedestrianType.LEFT}, {}, {}];
+let newSetup = [{}, {}, {}, {}];
 
 render(currentSetup);
 function render(setup) {
@@ -76,11 +90,11 @@ function renderDir(direction, index) {
     }
     else $("#vehicle" + index).addClass("hide");
 
-    if(direction.dir != undefined) {
-        let dirLetter = ['', 'l', 's', 'r'][dirDif(index, direction.dir)];
+    if(direction.arrow != undefined) {
+        let dirLetter = ['', 'l', 's', 'r'][dirDif(index, direction.arrow)];
         let el = $('#arrow' + index);
         el.removeClass();
-        el.attr("src", "img/" + dirLetter + "arrow.svg");
+        el.attr("src", "img/arrow" + dirLetter + ".svg");
     }
     else $("#arrow" + index).addClass("hide");
 
@@ -91,10 +105,18 @@ function renderDir(direction, index) {
     }
     else $("#extra" + index).addClass("hide");
 
+    if(direction.pedestrian != undefined) {
+        let el = $('#pedestrian' + index);
+        el.removeClass("hide");
+        el.attr("src", "img/pedestrian" + PedestrianType.letter[direction.pedestrian] + ".svg")
+    }
+    else $("#pedestrian" + index).addClass("hide");
+    
     if(direction.passage) {
         $('#passage' + index).removeClass("hide");
     }
     else $("#passage" + index).addClass("hide");
+    
 
 }
 
@@ -105,25 +127,15 @@ function dirDif(a, b) {
 }
 
 
-const menuItemType = {
-    car: "vehicle",
-    bike: "vehicle",
-    tram: "vehicle",
-    convoy: "vehicle",
-    pedestrian: "pedestrian",
-    passage: "passageway",
-    sharks: "addition",
+const menuItems = {
+    car:        new MenuItem({vehicle: VType.CAR, texture: "red car"}, "vehicle"),
+    bike:       new MenuItem({vehicle: VType.CAR, texture: "blue car"}, "vehicle"),
+    tram:       new MenuItem({vehicle: VType.TRAM, texture: "green car"}, "vehicle"),
+    convoy:     new MenuItem({vehicle: VType.CONVOY}, "vehicle"),
+    pedestrian: new MenuItem({pedestrian: PedestrianType.HOVER}, "pedestrian"),
+    passage:    new MenuItem({passage: true}, "passageway"),
+    sharks:     new MenuItem({extra: ExtraType.SHARKS}, "addition", true),
 }
-const menuItemIsPlural = {
-    sharks: true
-};
-const menuToKeyValuePair = {
-    car: {vehicle: VType.CAR, texture: "red car"},
-    bike: {vehicle: VType.CAR, texture: "blue car"},
-    tram: {vehicle: VType.TRAM, texture: "green car"},
-    sharks: {extra: ExtraType.SHARKS},
-    passage: {passage: true},
-};
 let menuTarget = undefined;
 function menuClick(item) {
     // Make sure only one menu item is highlighted
@@ -135,11 +147,11 @@ function menuClick(item) {
 
     // Highlight the menu item
     menuTarget.classList.add("selected");
-    placing = menuToKeyValuePair[itemId];
+    placing = menuItems[itemId].placeObject;
 
     // Show placing messages
     console.log(menuTarget);
-    if(menuItemIsPlural[itemId]) 
+    if(menuItems[itemId].plural) 
         $("#messageLeft").removeClass("hide").text("Placing " + menuTarget.innerText);
     else 
         $("#messageLeft").removeClass("hide").text("Placing a " + menuTarget.innerText);
@@ -147,12 +159,11 @@ function menuClick(item) {
         "Press escape to stop<br>"
         + "Right click to remove a"
         // Gotta have that correct English
-        + ("aeoui".includes(menuItemType[itemId].charAt(0)) ? "n " : " ")
-        + menuItemType[itemId]
+        + ("aeoui".includes(menuItems[itemId].type.charAt(0)) ? "n " : " ")
+        + menuItems[itemId].type
     );
 }
 
-let newSetup = [];
 function implementNewSetup(index) {
     currentSetup[index] = $.extend(true,{},newSetup[index]);
     renderDir(currentSetup[index], index);
@@ -167,11 +178,19 @@ function hitboxHover(index, direction) {
     else if(currentHover == index) currentHover = undefined;
     
     // Handle placement
-    if(placingDir != undefined && placingDir != index && direction) { // Check if we're placing a direction arrow
-        newSetup[placingDir].dir = index;
-        renderDir(newSetup[placingDir], placingDir);
+    if(placingSpecial.type == "arrow" && direction && placingSpecial.dir != index) { // Check if we're placing a special
+        newSetup[placingSpecial.dir].arrow = index;
+        renderDir(newSetup[placingSpecial.dir], placingSpecial.dir);
     }
-    else if(placing != undefined && placingDir == undefined) {
+    else if(placingSpecial.type == "pedestrian") {
+        const clickedDir = +(placingSpecial.dir);
+        const nextDir = (clickedDir + 1) % 4;
+        const dif = dirDif(index, clickedDir);
+
+        console.log(clickedDir, nextDir, dif);
+
+    }
+    else if(placing != undefined && placingSpecial.type == undefined) {
         if(direction) {
             currentToNewSetup(index);
             for(let obj of Object.entries(placing)) {
@@ -190,10 +209,17 @@ function hitboxClick(event) {
         // Get the clicked index
         let index = event.target.id.substr(6);
 
-        if(placingDir != undefined) {
+        if(placingSpecial.type != undefined) {
+            if(event.type == "contextmenu") {
+                renderDir(currentSetup[placingSpecial.dir], placingSpecial.dir);
+                placingSpecial = undefined;
+                placing = undefined;
+                return;
+            }
             // The clicked index is not necessarily the index the arrow is currently pointing at.
-            implementNewSetup(placingDir);            
-            placingDir = undefined;
+            implementNewSetup(placingSpecial.dir);            
+            placingSpecial.type = undefined;
+            placingPedestrian = undefined;
         }
         else if(event.type == "contextmenu") {
             for(let obj of Object.entries(placing)) {
@@ -207,8 +233,13 @@ function hitboxClick(event) {
             }
             renderDir(currentSetup[index], index);
         }
+        else if(placing.pedestrian != undefined) {
+            placingSpecial.type = "pedestrian";
+            placingSpecial.dir = index;
+        }
         else if(placing.vehicle != undefined) {
-            placingDir = index;
+            placingSpecial.type = "arrow";
+            placingSpecial.dir = index;
         }
         else {
             implementNewSetup(index);

@@ -100,33 +100,33 @@
     right: 0px;
 }
 
-.hitbox {
+.hitboxes div {
     position: absolute;
 }
 
-.hitbox.hit0 {
-    height: 20%;
-    width: 50%;
+.hit0 {
+    height: 70%;
+    width: 30%;
     right: 0;
-    top: 30%;
-}
-.hitbox.hit1 {
-    height: 50%;
-    width: 20%;
     top: 0;
-    left: 30%;
 }
-.hitbox.hit2 {
-    height: 20%;
-    width: 50%;
+.hit1 {
+    height: 30%;
+    width: 70%;
+    top: 0;
     left: 0;
-    bottom: 30%;
 }
-.hitbox.hit3 {
-    height: 50%;
-    width: 20%;
+.hit2 {
+    height: 70%;
+    width: 30%;
+    left: 0;
     bottom: 0;
-    right: 30%;
+}
+.hit3 {
+    height: 30%;
+    width: 70%;
+    bottom: 0;
+    right: 0;
 }
 
 .red {
