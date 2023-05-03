@@ -72,7 +72,7 @@ $(document).keyup(function(e) {
    }
 });
 
-let currentSetup = [{pedestrian: PedestrianType.RIGHT}, {pedestrian: PedestrianType.LEFT}, {}, {}];
+let currentSetup = [{vehicle: VType.CAR, texture: "red car", arrow: 1}, {}, {}, {}];
 let newSetup = [{}, {}, {}, {}];
 
 render(currentSetup);
@@ -93,7 +93,7 @@ function renderDir(direction, index) {
     if(direction.arrow != undefined) {
         let dirLetter = ['', 'l', 's', 'r'][dirDif(index, direction.arrow)];
         let el = $('#arrow' + index);
-        el.removeClass();
+        el.removeClass("hide");
         el.attr("src", "img/arrow" + dirLetter + ".svg");
     }
     else $("#arrow" + index).addClass("hide");
