@@ -233,8 +233,8 @@ function hitboxClick(event) {
                 newSetup[index][obj[0]] = undefined;
                 // Remove arrow if it's a vehicle
                 if(obj[0] == "vehicle") {
-                    currentSetup[index].dir = undefined;
-                    newSetup[index].dir = undefined;
+                    currentSetup[index].arrow = undefined;
+                    newSetup[index].arrow = undefined;
                 }
             }
             renderDir(currentSetup[index], index);
