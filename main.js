@@ -63,12 +63,7 @@ let currentHover = undefined;
 
 $(document).keyup(function(e) {
     if (e.key === "Escape") {
-        placing = undefined;
-        placingSpecial.type = undefined;
-        menuTarget.classList.remove("selected");
-        render(currentSetup);
-        $("#messageLeft").addClass("hide");
-        $("#messageRight").addClass("hide");
+        stopPlacing();
    }
 });
 
@@ -217,9 +212,7 @@ function hitboxClick(event) {
 
         if(placingSpecial.type != undefined) {
             if(event.type == "contextmenu") {
-                renderDir(currentSetup[placingSpecial.dir], placingSpecial.dir);
-                placingSpecial = undefined;
-                placing = undefined;
+                stopPlacing();
                 return;
             }
             if(placingSpecial.type == "pedestrian" && dirDif(placingSpecial.dir, index) > 1) return;
@@ -253,4 +246,13 @@ function hitboxClick(event) {
             implementNewSetup(index);
         }
     }
+}
+
+function stopPlacing() {
+    placing = undefined;
+    placingSpecial.type = undefined;
+    menuTarget.classList.remove("selected");
+    render(currentSetup);
+    $("#messageLeft").addClass("hide");
+    $("#messageRight").addClass("hide");
 }
