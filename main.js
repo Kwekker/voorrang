@@ -31,6 +31,9 @@ const extraFileName = ["", "sharks.svg", "stop.svg", "unhardened.svg"];
 let placing = undefined;
 let placingSpecial = {type: undefined, dir: 0};
 
+let currentSetup = [{vehicle: VType.CAR, texture: "red car", arrow: 1}, {}, {}, {}];
+let newSetup = [{from: 0}, {from: 1}, {from: 2}, {from: 3}];
+
 
 class MenuItem {
     constructor(placeObject, type, plural) {
@@ -66,9 +69,6 @@ $(document).keyup(function(e) {
         stopPlacing();
    }
 });
-
-let currentSetup = [{vehicle: VType.CAR, texture: "red car", arrow: 1}, {}, {}, {}];
-let newSetup = [{}, {}, {}, {}];
 
 render(currentSetup);
 function render(setup) {
@@ -114,13 +114,6 @@ function renderDir(direction, index) {
     
 
 }
-
-function dirDif(a, b) {
-    let dif = (a - b) % 4;
-    while(dif < 0) dif += 4;
-    return dif;
-}
-
 
 const menuItems = {
     car:        new MenuItem({vehicle: VType.CAR, texture: "red car"}, "vehicle"),

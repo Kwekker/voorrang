@@ -57,3 +57,18 @@ const collisions = [
         ]
     ],
 ]
+
+
+
+function priority(first, second) {
+    let relativeDir = dirDif(second.from, first.from);
+    if(collisions[first.arrow][relativeDir][second.arrow] == false) return "none";
+    
+}
+
+
+function dirDif(a, b) {
+    let dif = (a - b) % 4;
+    while(dif < 0) dif += 4;
+    return dif;
+}
