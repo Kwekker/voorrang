@@ -65,6 +65,17 @@
 .message.right {
     right: 5%;
 }
+.flashgreen {
+    background-color: green;
+    animation-name: flash;
+    animation-delay: 100ms;
+    animation-duration: 500ms;
+    animation-fill-mode: forwards;
+}
+@keyframes flash {
+    from {background-color: green;}
+    to {background-color: #222;}
+}
 
 .corner {
     background-color: darkgray;

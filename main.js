@@ -34,6 +34,9 @@ let placingSpecial = {type: undefined, dir: 0};
 let currentSetup = [{vehicle: VType.CAR, texture: "red car", arrow: 1}, {}, {}, {}];
 let newSetup = [{from: 0}, {from: 1}, {from: 2}, {from: 3}];
 
+// For remembering the previous message when placing a special item (like arrows).
+let prevMessage = "";
+
 
 class MenuItem {
     constructor(placeObject, type, plural) {
@@ -140,9 +143,9 @@ function menuClick(item) {
     // Show placing messages
     console.log(menuTarget);
     if(menuItems[itemId].plural) 
-        $("#messageLeft").removeClass("hide").text("Placing " + menuTarget.innerText);
+        $("#messageLeft").removeClass("hide").text("Place " + menuTarget.innerText);
     else 
-        $("#messageLeft").removeClass("hide").text("Placing a " + menuTarget.innerText);
+        $("#messageLeft").removeClass("hide").text("Place a " + menuTarget.innerText);
     $("#messageRight").removeClass("hide").html(
         "Press escape to stop<br>"
         + "Right click to remove a"
@@ -208,9 +211,13 @@ function hitboxClick(event) {
                 stopPlacing();
                 return;
             }
+            // The clicked index is not necessarily the index of the object we're placing,
+            // so we use placingSpecial.dir instead of index.
             if(placingSpecial.type == "pedestrian" && dirDif(placingSpecial.dir, index) > 1) return;
-            // The clicked index is not necessarily the index the arrow is currently pointing at.
-            implementNewSetup(placingSpecial.dir);            
+            implementNewSetup(placingSpecial.dir); 
+            
+            // Replace the message box on the left with the old message.
+            $("#messageLeft").text(prevMessage);        
             placingSpecial.type = undefined;
         }
         else if(event.type == "contextmenu") {
@@ -230,15 +237,26 @@ function hitboxClick(event) {
             renderDir(newSetup[index], index);
             placingSpecial.type = "pedestrian";
             placingSpecial.dir = index;
+            
+            leftMessage("Select the side the pedestrian is coming from");
         }
         else if(placing.vehicle != undefined) {
             placingSpecial.type = "arrow";
             placingSpecial.dir = index;
+            
+            leftMessage("Place the vehicle's destination");
         }
         else {
             implementNewSetup(index);
         }
     }
+}
+
+function leftMessage(messageText) {
+    prevMessage = $("#messageLeft").text();
+    $("#messageLeft").text(messageText);
+    $("#messageLeft").addClass("flashgreen");
+    setTimeout(function() {$("#messageLeft").removeClass("flashgreen")}, 1000);
 }
 
 function stopPlacing() {
