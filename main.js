@@ -126,10 +126,12 @@ const menuItems = {
     pedestrian: new MenuItem({pedestrian: PedestrianType.HOVER}, "pedestrian"),
     passage:    new MenuItem({passage: true}, "passageway"),
     sharks:     new MenuItem({extra: ExtraType.SHARKS}, "addition", true),
+    priority:   new MenuItem({priority: true}, "priority road", false),
 }
 let menuTarget = undefined;
 function menuClick(item) {
     // Make sure only one menu item is highlighted
+    console.log(item.target.id);
     if(menuTarget != undefined) menuTarget.classList.remove("selected");
 
     menuTarget = item.target;
