@@ -114,6 +114,13 @@ function renderDir(direction, index) {
         $('#passage' + index).removeClass("hide");
     }
     else $("#passage" + index).addClass("hide");
+
+    if(direction.priority != undefined) {
+        if(direction.priority == "sign") {
+            $("#prioritysign" + index).removeClass("hide");
+        }
+    }
+    else $("#prioritysign" + index).addClass("hide");
     
 
 }
@@ -126,16 +133,15 @@ const menuItems = {
     pedestrian: new MenuItem({pedestrian: PedestrianType.HOVER}, "pedestrian"),
     passage:    new MenuItem({passage: true}, "passageway"),
     sharks:     new MenuItem({extra: ExtraType.SHARKS}, "addition", true),
-    priority:   new MenuItem({priority: true}, "priority road", false),
+    priority:   new MenuItem({priority: "sign"}, "priority road", false),
 }
 let menuTarget = undefined;
 function menuClick(item) {
     // Make sure only one menu item is highlighted
-    console.log(item.target.id);
     if(menuTarget != undefined) menuTarget.classList.remove("selected");
 
     menuTarget = item.target;
-    if(menuTarget.tagName == "IMG") menuTarget = menuTarget.parentElement;
+    while(menuTarget.id == "") menuTarget = menuTarget.parentElement;
     let itemId = menuTarget.id.substr(4);
 
     // Highlight the menu item
