@@ -163,12 +163,15 @@ function menuClick(item) {
     );
 }
 
-function implementNewSetup(index) {
-    currentSetup[index] = $.extend(true,{},newSetup[index]);
-    renderDir(currentSetup[index], index);
+function implementNewSetup() {
+    for(index in currentSetup) {
+        currentSetup[index] = $.extend(true,{},newSetup[index]);
+        console.log("fuckin uhhhh", currentSetup[index], index);
+    }
+    render(currentSetup);
 }
-function currentToNewSetup(index) {
-    newSetup[index] = $.extend(true,{},currentSetup[index]);
+function currentToNewSetup() {
+    for(index in currentSetup) newSetup[index] = $.extend(true,{},currentSetup[index]);
 }
 
 function hitboxHover(index, direction) {
@@ -194,6 +197,11 @@ function hitboxHover(index, direction) {
         }
         renderDir(newSetup[clickedIndex], clickedIndex);
 
+    }
+    else if(placingSpecial.type == "priority" && index != placingSpecial.dir) {
+        if(direction) newSetup[index].priority = "sign";
+        else newSetup[index].priority = currentSetup.priority;
+        renderDir(newSetup[index], index);
     }
     else if(placing != undefined && placingSpecial.type == undefined) {
         if(direction) {
@@ -222,7 +230,7 @@ function hitboxClick(event) {
             // The clicked index is not necessarily the index of the object we're placing,
             // so we use placingSpecial.dir instead of index.
             if(placingSpecial.type == "pedestrian" && dirDif(placingSpecial.dir, index) > 1) return;
-            implementNewSetup(placingSpecial.dir); 
+            implementNewSetup();
             
             // Replace the message box on the left with the old message.
             $("#messageLeft").text(prevMessage);        
@@ -254,8 +262,22 @@ function hitboxClick(event) {
             
             leftMessage("Place the vehicle's destination");
         }
+        else if(placing.priority != undefined) {
+            placingSpecial.type = "priority";
+            placingSpecial.dir = index;
+            $("#priority").addClass("hide");
+            // This option also edits roads that are not the clicked road,
+            // so the whole setup needs to be copied.
+
+            currentToNewSetup();
+            for(i in newSetup) newSetup[i].priority = undefined;
+            newSetup[index].priority = "sign";
+            render(newSetup);
+            
+            leftMessage("Select the end of the priority road");
+        }
         else {
-            implementNewSetup(index);
+            implementNewSetup();
         }
     }
 }
