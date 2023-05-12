@@ -73,8 +73,10 @@ $(document).keyup(function(e) {
    }
 });
 
+let changedLines = false;
 render(currentSetup);
 function render(setup) {
+    changedLines = false;
     for(let i = 0; i < 4; i++) {        
         renderDir(setup[i], i);
     }
@@ -116,8 +118,10 @@ function renderDir(direction, index) {
     else $("#passage" + index).addClass("hide");
 
     if(direction.priority != undefined) {
-        if(direction.priority == "sign") {
-            $("#prioritysign" + index).removeClass("hide");
+        $("#prioritysign" + index).removeClass("hide");
+        if(changedLines == false) {
+            changedLines = true;
+            changeLines(direction.priority, index);
         }
     }
     else $("#prioritysign" + index).addClass("hide");
@@ -133,7 +137,7 @@ const menuItems = {
     pedestrian: new MenuItem({pedestrian: PedestrianType.HOVER}, "pedestrian"),
     passage:    new MenuItem({passage: true}, "passageway"),
     sharks:     new MenuItem({extra: ExtraType.SHARKS}, "addition", true),
-    priority:   new MenuItem({priority: "sign"}, "priority road", false),
+    priority:   new MenuItem({priority: 0}, "priority road", false),
 }
 let menuTarget = undefined;
 function menuClick(item) {
@@ -166,7 +170,6 @@ function menuClick(item) {
 function implementNewSetup() {
     for(index in currentSetup) {
         currentSetup[index] = $.extend(true,{},newSetup[index]);
-        console.log("fuckin uhhhh", currentSetup[index], index);
     }
     render(currentSetup);
 }
@@ -199,9 +202,12 @@ function hitboxHover(index, direction) {
 
     }
     else if(placingSpecial.type == "priority" && index != placingSpecial.dir) {
-        if(direction) newSetup[index].priority = "sign";
+        if(direction) {
+            newSetup[index].priority = placingSpecial.dir;
+            newSetup[placingSpecial.dir].priority = index;
+        }
         else newSetup[index].priority = currentSetup.priority;
-        renderDir(newSetup[index], index);
+        render(newSetup);
     }
     else if(placing != undefined && placingSpecial.type == undefined) {
         if(direction) {
@@ -230,6 +236,7 @@ function hitboxClick(event) {
             // The clicked index is not necessarily the index of the object we're placing,
             // so we use placingSpecial.dir instead of index.
             if(placingSpecial.type == "pedestrian" && dirDif(placingSpecial.dir, index) > 1) return;
+            else if(placingSpecial.dir == index) return;
             implementNewSetup();
             
             // Replace the message box on the left with the old message.
@@ -271,7 +278,7 @@ function hitboxClick(event) {
 
             currentToNewSetup();
             for(i in newSetup) newSetup[i].priority = undefined;
-            newSetup[index].priority = "sign";
+            newSetup[index].priority = index;
             render(newSetup);
             
             leftMessage("Select the end of the priority road");
@@ -296,4 +303,28 @@ function stopPlacing() {
     render(currentSetup);
     $("#messageLeft").addClass("hide");
     $("#messageRight").addClass("hide");
+}
+
+function changeLines(dir0, dir1) {
+    let pLines = $("#priority");
+    if(dir1 == undefined) {
+        $("#straightlines").removeClass("hide");
+        pLines.addClass("hide");
+        return;
+    }
+    let dif = dirDif(dir0, dir1);
+
+    $("#straightlines").addClass("hide");
+    pLines.removeClass();
+    console.log(dir0, dir1);
+    switch(dif) {
+        case 1:
+            pLines.addClass("deflect dir" + dir1);
+            break;
+        case 2:
+            pLines.addClass("straight dir" + dir1);
+            break;
+        case 3:
+            pLines.addClass("deflect dir" + dir0);
+    }
 }
