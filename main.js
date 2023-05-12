@@ -15,14 +15,14 @@ const PedestrianType = {
 
 const ExtraType = {
     NONE: 0,
-    SHARKS: 1,
-    STOP: 2,
-    UNHARDENED: 3,
     // ExtraType.EXIT is an "uitrit", which means you have to let EVERYONE go first.
     // It overrules all the other 'extra' types, so I'm adding it to this category,
     // because you'll never see any of these ones at the same time.
     // (Ok you might see an unhardened road with a stop sign but that doesn't do anything to the rules.)
-    EXIT: 4
+    EXIT: 1,
+    SHARKS: 2,
+    STOP: 3,
+    UNHARDENED: 4,
 }
 const extraFileName = ["", "sharks.svg", "stop.svg", "unhardened.svg"];
 

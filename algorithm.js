@@ -66,6 +66,19 @@ function priority(first, second) {
     
 }
 
+// The algorithm uses a level system/
+// A vehicle's level is based on the situation, not the vehicle.
+// Levels always have priority over the other rules (priority to the right, straight on same road goes first, etc.)
+// There is one exception to that rule (because of course there is), which has to do with convoys.
+// You can NEVER start driving in between a convoy,
+// and you can only cross one when you are on a priority road, which is directly crossing the convoy.
+function getLevel(road) {
+    if(road.extra == ExtraType.EXIT) return 0;
+    if(road.extra > ExtraType.EXIT) return 1;
+    if(road.priority >= 0) return 3;
+    return 2;
+}
+
 
 function dirDif(a, b) {
     let dif = (a - b) % 4;
