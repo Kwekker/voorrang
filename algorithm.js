@@ -50,7 +50,7 @@ const collisions = [
             true, true, false
         ],
         [   // Traffic coming from in front
-            true, true, true
+            false, true, true
         ],
         [   // Traffic coming from the left
             false, true, true
