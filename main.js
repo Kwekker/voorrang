@@ -112,10 +112,10 @@ function renderDir(direction, index) {
     }
     else $("#pedestrian" + index).addClass("hide");
     
-    if(direction.passage) {
-        $('#passage' + index).removeClass("hide");
+    if(direction.crosswalk) {
+        $('#crosswalk' + index).removeClass("hide");
     }
-    else $("#passage" + index).addClass("hide");
+    else $("#crosswalk" + index).addClass("hide");
 
     if(direction.priority != undefined) {
         $("#prioritysign" + index).removeClass("hide");
@@ -135,7 +135,7 @@ const menuItems = {
     tram:       new MenuItem({vehicle: VType.TRAM, texture: "green car"}, "vehicle"),
     convoy:     new MenuItem({vehicle: VType.CONVOY}, "vehicle"),
     pedestrian: new MenuItem({pedestrian: PedestrianType.HOVER}, "pedestrian"),
-    passage:    new MenuItem({passage: true}, "passageway"),
+    crosswalk:    new MenuItem({crosswalk: true}, "crosswalk"),
     sharks:     new MenuItem({extra: ExtraType.SHARKS}, "addition", true),
     priority:   new MenuItem({priority: 0}, "priority road", false),
 }
@@ -236,7 +236,7 @@ function hitboxClick(event) {
             // The clicked index is not necessarily the index of the object we're placing,
             // so we use placingSpecial.dir instead of index.
             if(placingSpecial.type == "pedestrian" && dirDif(placingSpecial.dir, index) > 1) return;
-            else if(placingSpecial.dir == index) return;
+            else if(placingSpecial.dir == index && placingSpecial.type != "pedestrian") return;
             implementNewSetup();
             
             // Replace the message box on the left with the old message.
