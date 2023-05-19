@@ -73,13 +73,12 @@ $(document).keyup(function(e) {
    }
 });
 
-let changedLines = false;
 render(currentSetup);
 function render(setup) {
-    changedLines = false;
     for(let i = 0; i < 4; i++) {        
         renderDir(setup[i], i);
     }
+    renderPriority(setup);
 }
 
 function renderDir(direction, index) {
@@ -119,14 +118,30 @@ function renderDir(direction, index) {
 
     if(direction.priority != undefined) {
         $("#prioritysign" + index).removeClass("hide");
-        if(changedLines == false) {
-            changedLines = true;
-            changeLines(direction.priority, index);
-        }
     }
     else $("#prioritysign" + index).addClass("hide");
-    
+}
 
+function renderPriority(setup) {
+    // This is necessary because I don't use any sort of global storage thing when storing the setup.
+    // Everything is stored per road, so the program has to find which roads have priority and which ones don't
+    // before drawing the priority road.
+    let priority = false;
+    for(let i in setup) {
+        if(setup[i].priority != undefined) {
+            priority = [i, setup[i].priority];
+            break;
+        }
+    }
+    
+    // This function automatically changes the lines back if priority[0] is undefined
+    changeLines(priority[0], priority[1]);
+    // Add and remove the shark teeth from roads that don't have priority
+    for(let i = 0; i < 4; i++) {
+        // Gotta love short circuiting
+        if(priority == false || priority[0] == priority[1] || i == priority[0] || i == priority[1]) $("#sharks" + i).addClass("hide");
+        else $("#sharks" + i).removeClass("hide");
+    }
 }
 
 const menuItems = {
@@ -206,7 +221,10 @@ function hitboxHover(index, direction) {
             newSetup[index].priority = placingSpecial.dir;
             newSetup[placingSpecial.dir].priority = index;
         }
-        else newSetup[index].priority = currentSetup.priority;
+        else {
+            newSetup[index].priority = currentSetup.priority;
+            newSetup[placingSpecial.dir].priority = placingSpecial.dir;
+        }
         render(newSetup);
     }
     else if(placing != undefined && placingSpecial.type == undefined) {
@@ -226,7 +244,7 @@ function hitboxHover(index, direction) {
 function hitboxClick(event) {
     if(placing != undefined) {
         // Get the clicked index
-        let index = event.target.id.substr(6);
+        let index = +event.target.id.substr(6);
 
         if(placingSpecial.type != undefined) {
             if(event.type == "contextmenu") {
@@ -244,6 +262,10 @@ function hitboxClick(event) {
             placingSpecial.type = undefined;
         }
         else if(event.type == "contextmenu") {
+            if(placing.priority != undefined)
+                // This is my favorite line in the entire script
+                currentSetup[currentSetup[index].priority].priority = undefined;
+
             for(let obj of Object.entries(placing)) {
                 currentSetup[index][obj[0]] = undefined;
                 newSetup[index][obj[0]] = undefined;
@@ -253,7 +275,7 @@ function hitboxClick(event) {
                     newSetup[index].arrow = undefined;
                 }
             }
-            renderDir(currentSetup[index], index);
+            render(currentSetup);
         }
         else if(placing.pedestrian != undefined) {
             newSetup[index].pedestrian = PedestrianType.RIGHT;
