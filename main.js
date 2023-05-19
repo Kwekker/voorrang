@@ -24,7 +24,7 @@ const ExtraType = {
     STOP: 3,
     UNHARDENED: 4,
 }
-const extraFileName = ["", "sharks.svg", "stop.svg", "unhardened.svg"];
+const extraFileName = ["", "exit.svg", "sharks.svg", "stop.svg", "unhardened.svg"];
 
 // placing is an object with the elements that have to be added to the setup direction object.
 // For example: {vehicle: VType.car}

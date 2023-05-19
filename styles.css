@@ -2,7 +2,8 @@
 
 .menu {
     background-color: #222;
-    border-left: white 1px solid;
+    border-left: grey 1px solid;
+    border-bottom: grey 1px solid;
     float: right;
     width: 220px;
     font-size: 20px;
@@ -50,7 +51,7 @@
 	position: absolute;
     top: 0;
     width: 20%;
-	margin-top: 10px;
+	margin: 10px 0;
 	padding: 20px 0;
 	border: 3px solid black;
 	background-color: #222;
@@ -65,6 +66,11 @@
 .message.right {
     right: 5%;
 }
+.message.bRight{
+    right: 5%;
+    bottom: 0;
+    top: auto;
+}
 .flashgreen {
     background-color: green;
     animation-name: flash;
@@ -77,37 +83,24 @@
     to {background-color: #222;}
 }
 
+
 .corner {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+.corner > div{
+    box-sizing: border-box;
     background-color: darkgray;
     display: inline-block;
     position: absolute;
     border: dimgray 10px solid;
     width: 30%;
     height: 30%;
-}
 
-.corner.topRight {
     border-top: none;
     border-right: none;
     top: 0px;
-    right: 0px;
-}
-.corner.topLeft {
-    border-top: none;
-    border-left: none;
-    top: 0px;
-    left: 0px;
-}
-.corner.bottomLeft {
-    border-left: none;
-    border-bottom: none;
-    bottom: 0px;
-    left: 0px;
-}
-.corner.bottomRight {
-    border-right: none;
-    border-bottom: none;
-    bottom: 0px;
     right: 0px;
 }
 
@@ -162,7 +155,7 @@
     top: 34.5%;
 }
 
-.arrow, .extra, .pedestrian, .crosswalk {
+.arrow, .extra, .pedestrian, .crosswalk, .sharks{
     width: 100%;
     height: 100%;
 }
@@ -170,7 +163,6 @@
 #priority {
     position: absolute;
 }
-
 #priority.deflect {
 	width: 37%;
 	height: 37%;
@@ -180,24 +172,39 @@
 	border-bottom: 10px dashed white;
 	border-left: 10px dashed white;
 }
-
-.sign.priority {
-	background: white;
-	border: black solid 8px;
-	border-radius: 10%;
-	width: 5%;
-	height: 5%;
-	rotate: 45deg;
+#priority.straight {
+    box-sizing: border-box;
+    height: 38%;
+    width: 100%;
+    top: 31%;
+    left: 0;
+	border-top: 10px dashed white;
+    border-bottom: 10px dashed white;
 }
-.menu .sign.priority {
+
+.menu .prioritysign {
     margin: auto;
     width: 80px;
     height: 80px;
     margin-bottom: 20px;
     margin-top: 20px;
 }
-
-.sign.priority div {
+.dir .prioritysign {
+    top: 23%;
+    right: 13%;
+    width: 5%;
+    height: 5%;
+}
+.prioritysign > div {
+    margin: auto;
+    rotate: 45deg;
+    background: white;
+    border: black solid 4px;
+    border-radius: 10%;
+    width: 70.71%;
+    height: 70.71%;
+}
+.prioritysign>div>div {
     position: absolute;
     background: #ffee00;
     width: 70%;
@@ -205,11 +212,6 @@
     top: 14%;
     left: 14%;
     border-radius: 3%;
-}
-
-.dir .sign.priority {
-    top: 20%;
-    right: 10%;
 }
 
 .dir {
