@@ -164,11 +164,11 @@
     position: absolute;
 }
 #priority.deflect {
-	width: 37%;
-	height: 37%;
+	width: 38%;
+	height: 38%;
 	border-radius: 0 0 0 100%;
-	right: 31%;
-	top: 31%;
+	right: 30%;
+	top: 30%;
 	border-bottom: 10px dashed white;
 	border-left: 10px dashed white;
 }

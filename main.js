@@ -166,6 +166,7 @@ function menuClick(item) {
     // Highlight the menu item
     menuTarget.classList.add("selected");
     placing = menuItems[itemId].placeObject;
+    
 
     // Show placing messages
     console.log(menuTarget);
@@ -197,7 +198,7 @@ function hitboxHover(index, direction) {
     if(direction) currentHover = index;
     else if(currentHover == index) currentHover = undefined;
     
-    // Handle placement
+    // Handle special placement
     if(placingSpecial.type == "arrow" && direction && placingSpecial.dir != index) { // Check if we're placing a special
         newSetup[placingSpecial.dir].arrow = index;
         renderDir(newSetup[placingSpecial.dir], placingSpecial.dir);
@@ -227,6 +228,7 @@ function hitboxHover(index, direction) {
         }
         render(newSetup);
     }
+    // Handle non special placement
     else if(placing != undefined && placingSpecial.type == undefined) {
         if(direction) {
             currentToNewSetup(index);
@@ -306,9 +308,30 @@ function hitboxClick(event) {
             leftMessage("Select the end of the priority road");
         }
         else {
+            // Remove priority roads when the user adds something that lowers the priority level of the road,
+            // like shark teeth.
+            if(placing.extra != undefined) {
+                if(currentSetup[index].priority != undefined) {
+                    for(let dir of newSetup) {
+                        dir.priority = undefined;
+                    }
+                }
+                else if(placing.extra == ExtraType.SHARKS && isThereAPriorityRoad(currentSetup)) {
+                    // If there already is a priority road, then there will already be shark teeth.
+                    return;
+                }
+            }
             implementNewSetup();
         }
     }
+}
+
+// Best function name awards 2023
+function isThereAPriorityRoad(setup) {
+    for(let dir of newSetup)
+        if(dir.priority != undefined) return true;
+
+    return false;
 }
 
 function leftMessage(messageText) {
