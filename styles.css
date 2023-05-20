@@ -160,6 +160,19 @@
     height: 100%;
 }
 
+.sign {
+    width: 8%;
+    right: 12%;
+}
+.sign.in {
+    rotate: 90deg;
+    top: 73%;
+}
+.sign.out {
+    rotate: -90deg;
+    bottom: 73%;
+}
+
 #priority {
     position: absolute;
 }
