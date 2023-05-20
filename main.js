@@ -136,18 +136,6 @@ function renderPriority(setup) {
     
     // This function automatically changes the lines back if priority[0] is undefined
     changeLines(priority[0], priority[1]);
-    // Add and remove the shark teeth from roads that don't have priority
-    for(let i = 0; i < 4; i++) {
-        // Gotta love short circuiting
-        // if(priority == false || priority[0] == priority[1] || i == priority[0] || i == priority[1]) $("#sharks" + i).addClass("hide");
-        // else $("#sharks" + i).removeClass("hide");
-        const el = $("#extra" + i);
-        if(setup[i].extra == undefined && priority != false && priority[0] != priority[1] && priority[0] != i && priority[1] != i) {
-            el.removeClass("hide");
-            el.attr("src", "img/sharks.svg");
-        }
-        else if(setup[i].extra == undefined) el.addClass("hide");
-    }
 }
 
 const menuItems = {
@@ -228,10 +216,14 @@ function hitboxHover(index, direction) {
         if(direction) {
             newSetup[index].priority = placingSpecial.dir;
             newSetup[placingSpecial.dir].priority = index;
+            for(let i = 0; i < 4; i++) 
+                if(i != index && i != placingSpecial.dir && newSetup[i].extra == undefined)
+                    newSetup[i].extra = ExtraType.SHARKS;
         }
         else {
             newSetup[index].priority = currentSetup.priority;
             newSetup[placingSpecial.dir].priority = placingSpecial.dir;
+            for(let i = 0; i < 4; i++) newSetup[i].extra = currentSetup[i].extra;
         }
         render(newSetup);
     }
@@ -255,6 +247,7 @@ function hitboxClick(event) {
         // Get the clicked index
         let index = +event.target.id.substr(6);
 
+        // Giant fucking if-else tree incoming
         if(placingSpecial.type != undefined) {
             if(event.type == "contextmenu") {
                 stopPlacing();
@@ -322,22 +315,14 @@ function hitboxClick(event) {
             
             leftMessage("Select the end of the priority road");
         }
-        else {
             // Remove priority roads when the user adds something that lowers the priority level of the road,
             // like shark teeth.
-            if(placing.extra != undefined) {
-                if(currentSetup[index].priority != undefined) {
-                    for(let dir of newSetup) {
-                        dir.priority = undefined;
-                    }
-                }
-                else if(placing.extra == ExtraType.SHARKS && isThereAPriorityRoad(currentSetup)) {
-                    // If there already is a priority road, then there will already be shark teeth.
-                    return;
-                }
-            }
+        else if(placing.extra != undefined && currentSetup[index].priority != undefined) {
+            for(let dir of newSetup) dir.priority = undefined;
             implementNewSetup();
         }
+
+        else implementNewSetup();
     }
 }
 
