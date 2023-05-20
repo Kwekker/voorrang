@@ -139,8 +139,14 @@ function renderPriority(setup) {
     // Add and remove the shark teeth from roads that don't have priority
     for(let i = 0; i < 4; i++) {
         // Gotta love short circuiting
-        if(priority == false || priority[0] == priority[1] || i == priority[0] || i == priority[1]) $("#sharks" + i).addClass("hide");
-        else $("#sharks" + i).removeClass("hide");
+        // if(priority == false || priority[0] == priority[1] || i == priority[0] || i == priority[1]) $("#sharks" + i).addClass("hide");
+        // else $("#sharks" + i).removeClass("hide");
+        const el = $("#extra" + i);
+        if(setup[i].extra == undefined && priority != false && priority[0] != priority[1] && priority[0] != i && priority[1] != i) {
+            el.removeClass("hide");
+            el.attr("src", "img/sharks.svg");
+        }
+        else if(setup[i].extra == undefined) el.addClass("hide");
     }
 }
 
@@ -150,9 +156,10 @@ const menuItems = {
     tram:       new MenuItem({vehicle: VType.TRAM, texture: "green car"}, "vehicle"),
     convoy:     new MenuItem({vehicle: VType.CONVOY}, "vehicle"),
     pedestrian: new MenuItem({pedestrian: PedestrianType.HOVER}, "pedestrian"),
-    crosswalk:    new MenuItem({crosswalk: true}, "crosswalk"),
+    crosswalk:  new MenuItem({crosswalk: true}, "crosswalk"),
     sharks:     new MenuItem({extra: ExtraType.SHARKS}, "addition", true),
     priority:   new MenuItem({priority: 0}, "priority road", false),
+    exit:       new MenuItem({extra: ExtraType.EXIT}, "addition", false),
 }
 let menuTarget = undefined;
 function menuClick(item) {
