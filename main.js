@@ -264,6 +264,14 @@ function hitboxClick(event) {
             // so we use placingSpecial.dir instead of index.
             if(placingSpecial.type == "pedestrian" && dirDif(placingSpecial.dir, index) > 1) return;
             else if(placingSpecial.dir == index && placingSpecial.type != "pedestrian") return;
+
+            // A priority road cannot have a degrading extra (like shark teeth),
+            // so we remove the shark teeth on both ends of the priority road.
+            if(placingSpecial.type == "priority") {
+                newSetup[placingSpecial.dir].extra = undefined;
+                newSetup[newSetup[placingSpecial.dir].priority].extra = undefined;
+            }
+
             implementNewSetup();
             
             // Replace the message box on the left with the old message.
