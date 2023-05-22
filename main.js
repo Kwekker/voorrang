@@ -24,7 +24,14 @@ const ExtraType = {
     STOP: 3,
     UNHARDENED: 4,
 }
-const extraFileName = ["", "exit.svg", "sharks.svg", "stop.svg", "unhardened.svg"];
+
+const extras = [
+    {},
+    {fileName: "exit.svg", inSign: "G05.svg", outSign: "G06.svg"},
+    {fileName: "sharks.svg"},
+    {fileName: "stop.svg"},
+    {filename: "unhardened.svg"}
+]
 
 // placing is an object with the elements that have to be added to the setup direction object.
 // For example: {vehicle: VType.car}
@@ -98,11 +105,25 @@ function renderDir(direction, index) {
     else $("#arrow" + index).addClass("hide");
 
     if(direction.extra != undefined) {
-        let el = $('#extra' + index);
-        el.removeClass("hide");
-        el.attr("src", "img/" + extraFileName[direction.extra]);
+        $('#extra' + index).removeClass("hide");
+        $('#extra' + index).attr("src", "img/" + extras[direction.extra].fileName);
+
+        if(extras[direction.extra].inSign != undefined) {
+            $("#insign" + index).removeClass("hide");
+            $("#insign" + index).attr("src", "img/" + extras[direction.extra].inSign);
+        }
+
+        if(extras[direction.extra].outSign != undefined) {
+            $("#outsign" + index).removeClass("hide");
+            $("#outsign" + index).attr("src", "img/" + extras[direction.extra].outSign);
+        }
     }
     else $("#extra" + index).addClass("hide");
+
+    if(direction.extra == undefined || extras[direction.extra].inSign == undefined) 
+        $("#insign" + index).addClass("hide");
+    if(direction.extra == undefined || extras[direction.extra].outSign == undefined)
+        $("#outsign" + index).addClass("hide");
 
     if(direction.pedestrian != undefined) {
         let el = $('#pedestrian' + index);
@@ -146,7 +167,7 @@ const menuItems = {
     pedestrian: new MenuItem({pedestrian: PedestrianType.HOVER}, "pedestrian"),
     crosswalk:  new MenuItem({crosswalk: true}, "crosswalk"),
     sharks:     new MenuItem({extra: ExtraType.SHARKS}, "addition", true),
-    priority:   new MenuItem({priority: 0}, "priority road", false),
+    priority:   new MenuItem({priority: 0, extra: undefined}, "priority road", false),
     exit:       new MenuItem({extra: ExtraType.EXIT}, "addition", false),
 }
 let menuTarget = undefined;
@@ -168,13 +189,12 @@ function menuClick(item) {
     if(menuItems[itemId].plural) 
         $("#messageLeft").removeClass("hide").text("Place " + menuTarget.innerText);
     else 
-        $("#messageLeft").removeClass("hide").text("Place a " + menuTarget.innerText);
+        $("#messageLeft").removeClass("hide").text("Place " + addPreposition(menuTarget.innerText));
     $("#messageRight").removeClass("hide").html(
         "Press escape to stop<br>"
-        + "Right click to remove a"
+        + "Right click to remove "
         // Gotta have that correct English
-        + ("aeoui".includes(menuItems[itemId].type.charAt(0)) ? "n " : " ")
-        + menuItems[itemId].type
+        + addPreposition(menuItems[itemId].type)
     );
 }
 
@@ -219,11 +239,15 @@ function hitboxHover(index, direction) {
             for(let i = 0; i < 4; i++) 
                 if(i != index && i != placingSpecial.dir && newSetup[i].extra == undefined)
                     newSetup[i].extra = ExtraType.SHARKS;
+            newSetup[index].extra = undefined;
         }
         else {
             newSetup[index].priority = currentSetup.priority;
             newSetup[placingSpecial.dir].priority = placingSpecial.dir;
-            for(let i = 0; i < 4; i++) newSetup[i].extra = currentSetup[i].extra;
+            newSetup[index].extra = currentSetup[index].extra;
+            for(let i = 0; i < 4; i++) 
+                if(i != index && i != placingSpecial.dir) 
+                    newSetup[i].extra = currentSetup[i].extra;
         }
         render(newSetup);
     }
@@ -311,6 +335,7 @@ function hitboxClick(event) {
             currentToNewSetup();
             for(i in newSetup) newSetup[i].priority = undefined;
             newSetup[index].priority = index;
+            newSetup[index].extra = undefined;
             render(newSetup);
             
             leftMessage("Select the end of the priority road");
@@ -373,3 +398,12 @@ function changeLines(dir0, dir1) {
             pLines.addClass("deflect dir" + dir0);
     }
 }
+
+function addPreposition(s) {
+    let testString = s.trimStart().charAt(0).toLowerCase();
+    // This doesn't work for every word of course (like "unicorn") but it works well enough.
+    if("aeoui".includes(testString)) return "an " + s;
+    else return "a " + s;
+    
+}
+
