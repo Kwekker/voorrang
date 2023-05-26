@@ -46,10 +46,12 @@ let prevMessage = "";
 
 
 class MenuItem {
-    constructor(placeObject, type, plural) {
+    constructor(placeObject, type, hasTextures, plural) {
         this.placeObject = placeObject;
         this.type = type;
+        this.hasTextures = hasTextures;
         this.plural = (plural == undefined ? false : plural);
+
     }
 }
 
@@ -160,15 +162,15 @@ function renderPriority(setup) {
 }
 
 const menuItems = {
-    car:        new MenuItem({vehicle: VType.CAR, texture: "red car"}, "vehicle"),
-    bike:       new MenuItem({vehicle: VType.CAR, texture: "blue car"}, "vehicle"),
-    tram:       new MenuItem({vehicle: VType.TRAM, texture: "green car"}, "vehicle"),
-    convoy:     new MenuItem({vehicle: VType.CONVOY}, "vehicle"),
-    pedestrian: new MenuItem({pedestrian: PedestrianType.HOVER}, "pedestrian"),
-    crosswalk:  new MenuItem({crosswalk: true}, "crosswalk"),
-    sharks:     new MenuItem({extra: ExtraType.SHARKS}, "addition", true),
-    priority:   new MenuItem({priority: 0, extra: undefined}, "priority road", false),
-    exit:       new MenuItem({extra: ExtraType.EXIT}, "addition", false),
+    car:        new MenuItem({vehicle: VType.CAR, texture: "red car"}, "vehicle", true, false),
+    bike:       new MenuItem({vehicle: VType.CAR, texture: "blue car"}, "vehicle", true, false),
+    tram:       new MenuItem({vehicle: VType.TRAM, texture: "green car"}, "vehicle", true, false),
+    convoy:     new MenuItem({vehicle: VType.CONVOY}, "vehicle", true, false), 
+    pedestrian: new MenuItem({pedestrian: PedestrianType.HOVER}, "pedestrian", true, false),
+    crosswalk:  new MenuItem({crosswalk: true}, "crosswalk", false, false),
+    sharks:     new MenuItem({extra: ExtraType.SHARKS}, "addition", false, true),
+    priority:   new MenuItem({priority: 0, extra: undefined}, "priority road", false, false),
+    exit:       new MenuItem({extra: ExtraType.EXIT}, "addition", false, false),
 }
 let menuTarget = undefined;
 function menuClick(item) {
@@ -182,10 +184,13 @@ function menuClick(item) {
     // Highlight the menu item
     menuTarget.classList.add("selected");
     placing = menuItems[itemId].placeObject;
+
+    if(menuItems[itemId].hasTextures) {
+        showTextureMenu(itemId);
+    } 
     
 
     // Show placing messages
-    console.log(menuTarget);
     if(menuItems[itemId].plural) 
         $("#messageLeft").removeClass("hide").text("Place " + menuTarget.innerText);
     else 
@@ -373,6 +378,8 @@ function stopPlacing() {
     render(currentSetup);
     $("#messageLeft").addClass("hide");
     $("#messageRight").addClass("hide");
+
+    hideTextureMenu();
 }
 
 function changeLines(dir0, dir1) {
@@ -397,6 +404,41 @@ function changeLines(dir0, dir1) {
         case 3:
             pLines.addClass("deflect dir" + dir0);
     }
+}
+
+function showTextureMenu(id) {
+    $("#textures").removeClass("hide");
+    $("#textures").empty();
+
+    $.ajax({
+        method: "POST",
+        url: "./getimgdir.php",
+        data: {subdir: id},
+        success: function (response) {
+            console.log("fuckin uhh", response);
+            let textures = response.split(":");
+
+            // The php puts a colon at the end, which split() interprets as an empty element in the array.
+            // Shortening the length by one fixes this.
+            textures.length--;
+
+            for(let dir of textures) {
+                if(dir.charAt(0) == ".") continue;
+
+                $("#textures").append(
+                    '<div><img src="img/' + id + "/" + dir + '">' + dir + '</div>'
+                );
+            }
+        },
+
+        error: function(err) {
+            console.error(err);
+        }
+    });
+}
+
+function hideTextureMenu() {
+    $("#textures").addClass("hide");
 }
 
 function addPreposition(s) {

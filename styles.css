@@ -11,8 +11,15 @@
     text-align: center;
 }
 .menu>div {
+    /* background-color: #222; */
     border-bottom: solid black 2px;
     padding: 8px 14px;
+    position: relative;
+    transition-duration: 300ms;
+    right: 0;
+}
+.menu>div:hover {
+    right: 20px;
 }
 .menu>div:last-child {
     border-bottom: none;
@@ -24,6 +31,17 @@
 .menu>div.selected {
     background-color: rgb(24, 46, 24);
 }
+
+#textures {
+    transition-duration: 200ms;
+    transform-origin: right;
+    border-right: grey 1px solid;
+}
+#textures.hide {
+    transform: scaleX(0);
+    display: initial;
+}
+
 
 .intersection {
     border-right: gainsboro solid 2px;
