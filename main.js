@@ -38,7 +38,7 @@ const extras = [
 let placing = undefined;
 let placingSpecial = {type: undefined, dir: 0};
 
-let currentSetup = [{vehicle: VType.CAR, texture: "red car", arrow: 1}, {}, {}, {}];
+let currentSetup = [{dir: 0, pedestrian: 1, pedestrianTexture: "wait.png"}, {dir: 1}, {dir: 2}, {dir: 3}];
 let newSetup = [{from: 0}, {from: 1}, {from: 2}, {from: 3}];
 
 // For remembering the previous message when placing a special item (like arrows).
@@ -128,11 +128,25 @@ function renderDir(direction, index) {
         $("#outsign" + index).addClass("hide");
 
     if(direction.pedestrian != undefined) {
-        let el = $('#pedestrian' + index);
-        el.removeClass("hide");
-        el.attr("src", "img/pedestrian" + PedestrianType.letter[direction.pedestrian] + ".svg")
+        const letter = PedestrianType.letter[direction.pedestrian];
+
+        $('#pedestrianarrow' + index).removeClass("hide");
+        if(letter == 'r' || letter == 'h') 
+            $('#pedestrianr' + index).removeClass("hide").attr("src", "img/pedestrian/" + "watch.png");
+        else $('#pedestrianr' + index).addClass("hide");
+
+        if(letter == 'l' || letter == 'h') 
+            $('#pedestrianl' + index).removeClass("hide").attr("src", "img/pedestrian/" + "watch.png");
+        else $('#pedestrianl' + index).addClass("hide");
+
+        $('#pedestrianarrow' + index).attr("src", "img/pedestrian" + letter + ".svg");
     }
-    else $("#pedestrian" + index).addClass("hide");
+    else {
+        $("#pedestrianarrow" + index).addClass("hide");
+        $('#pedestrianl' + index).addClass("hide");
+        $('#pedestrianr' + index).addClass("hide");
+
+    }
     
     if(direction.crosswalk) {
         $('#crosswalk' + index).removeClass("hide");

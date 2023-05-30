@@ -72,8 +72,13 @@ function priority(first, second) {
 // There is one exception to that rule (because of course there is), which has to do with convoys.
 // You can NEVER start driving in between a convoy,
 // and you can only cross one when you are on a priority road, which is directly crossing the convoy.
-function getLevel(road) {
+function hasLevelBasedPriority(road0, road1) {
     if(road.extra == ExtraType.EXIT) return 0;
+
+    // Extras like unhardened roads are special, because they are relative.
+    // If you're coming from an unhardened road, you have to let the people to your left and right go first,
+    // But there are no special rules regarding traffic coming from the road opposite to you.
+    // This problem is addressed in the function using this function.
     if(road.extra > ExtraType.EXIT) return 1;
     if(road.priority >= 0) return 3;
     return 2;
