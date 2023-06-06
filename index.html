@@ -19,7 +19,7 @@
   </head>
   <body>
     
-    <div class="menu" id="menu">
+    <div class="menu" id="menu" onclick="menuClick(event)">
         <div id="menucar">Car</div>
         <div id="menubike">Bike</div>
         <div id="menutram">Tram</div>
@@ -44,19 +44,8 @@
         </div>
 
     </div>
-    <div class="menu" id="textures">
-        <div>
-            <img src="img/pedestrian/nerd.jpg" alt="">
-            Nerd
-        </div>
-        <div>
-            <img src="img/pedestrian/cat.jpg" alt="">
-            Nerd
-        </div>
-        <div>
-            <img src="img/pedestrian/wait.jpg" alt="">
-            Nerd
-        </div>
+    
+    <div class="menu hide" id="textures" onclick="textureClick(event)">
     </div>
 
     <div class="intersection" id="intersection">

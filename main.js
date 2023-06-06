@@ -38,7 +38,7 @@ const extras = [
 let placing = undefined;
 let placingSpecial = {type: undefined, dir: 0};
 
-let currentSetup = [{dir: 0, pedestrian: 1, pedestrianTexture: "wait.png"}, {dir: 1}, {dir: 2}, {dir: 3}];
+let currentSetup = [{index: 0, pedestrian: 1, pedestrianTexture: "wait.png"}, {index: 1}, {index: 2}, {index: 3}];
 let newSetup = [{from: 0}, {from: 1}, {from: 2}, {from: 3}];
 
 // For remembering the previous message when placing a special item (like arrows).
@@ -56,10 +56,6 @@ class MenuItem {
 }
 
 const classNames = ["", "car", "bike", "tram", "convoy"];
-const menuItemElements = $("#menu").children();
-for(let i = 0; i < menuItemElements.length; i++) {
-    menuItemElements[i].addEventListener("click", menuClick);
-}
 
 let hitboxes = [];
 let corners = [];
@@ -132,11 +128,11 @@ function renderDir(direction, index) {
 
         $('#pedestrianarrow' + index).removeClass("hide");
         if(letter == 'r' || letter == 'h') 
-            $('#pedestrianr' + index).removeClass("hide").attr("src", "img/pedestrian/" + "watch.png");
+            $('#pedestrianr' + index).removeClass("hide").attr("src", "img/pedestrian/" + direction.pedestrianTexture);
         else $('#pedestrianr' + index).addClass("hide");
 
         if(letter == 'l' || letter == 'h') 
-            $('#pedestrianl' + index).removeClass("hide").attr("src", "img/pedestrian/" + "watch.png");
+            $('#pedestrianl' + index).removeClass("hide").attr("src", "img/pedestrian/" + direction.pedestrianTexture);
         else $('#pedestrianl' + index).addClass("hide");
 
         $('#pedestrianarrow' + index).attr("src", "img/pedestrian" + letter + ".svg");
@@ -199,10 +195,9 @@ function menuClick(item) {
     menuTarget.classList.add("selected");
     placing = menuItems[itemId].placeObject;
 
-    if(menuItems[itemId].hasTextures) {
-        showTextureMenu(itemId);
-    } 
-    
+    // Show the texture menu for items that have different textures
+    if(menuItems[itemId].hasTextures) showTextureMenu(itemId);
+    else hideTextureMenu();
 
     // Show placing messages
     if(menuItems[itemId].plural) 
@@ -420,6 +415,36 @@ function changeLines(dir0, dir1) {
     }
 }
 
+
+let textureTarget;
+function textureClick(item) {
+    // Make sure only one item is highlighted
+    if(textureTarget != undefined) textureTarget.classList.remove("selected");
+
+    // Get the actual div that contains the file name
+    textureTarget = item.target;
+    while(textureTarget.tagName != "DIV") textureTarget = textureTarget.parentElement;
+    let fileName = textureTarget.innerText;
+
+    // Highlight the menu item
+    textureTarget.classList.add("selected");
+
+    // Implement the texture
+    setTexture(fileName, placing);
+
+    // We want to rerender if the user is currently in the process of
+    // placing something that requires two steps to place.
+    if(placingSpecial.type != undefined) {
+        setTexture(fileName, newSetup[placingSpecial.dir]);
+        render(newSetup);
+    }
+}
+
+function setTexture(fileName, targetDir) {
+    if(placing.pedestrian) targetDir.pedestrianTexture = fileName;
+    else targetDir.texture = fileName;
+}
+
 function showTextureMenu(id) {
     $("#textures").removeClass("hide");
     $("#textures").empty();
@@ -443,6 +468,9 @@ function showTextureMenu(id) {
                     '<div><img src="img/' + id + "/" + dir + '">' + dir + '</div>'
                 );
             }
+            textureTarget = $("#textures").children()[0];
+            textureTarget.classList += "selected";
+            placing.texture = textureTarget.innerText;
         },
 
         error: function(err) {
